@@ -14,12 +14,17 @@ set up. The whole thing is a few hundred lines of clean, framework-free PHP.
 ## Features
 
 - 📊 **Create polls** with a question and 2+ options from a password-protected admin panel
+- ⏰ **Poll expiry** — optionally set a closing date/time; voting stops automatically and final
+  results are shown
+- 🛡️ **Rate limiting** on voting and admin logins (persistent, IP-based) to curb abuse and
+  brute-force attempts
 - 🔗 **Shareable short codes** — each poll gets a unique, human-friendly code (e.g. `Kp7mQ2`)
 - 🗳️ **One-click voting** with live percentage bars
 - 👀 **Real-time results** shown after a visitor votes
 - 🔒 **Hashed admin password**, CSRF protection on every form, and prepared SQL statements
+- 🐳 **Docker-ready** — `docker compose up` and you're running
 - 🪶 **Zero runtime dependencies** — just PHP 8.2+ with the SQLite extension
-- 🎨 Modern, responsive dark UI (Bootstrap 5 + a sprinkle of custom CSS)
+- 🎨 Clean, responsive light UI (Bootstrap 5 + a sprinkle of custom CSS)
 
 ## Requirements
 
@@ -27,7 +32,7 @@ set up. The whole thing is a few hundred lines of clean, framework-free PHP.
 - PHP extensions: `pdo` and `pdo_sqlite` (bundled with most PHP builds)
 - A web server (Apache, Nginx) — or just PHP's built-in server for local use
 
-## Quick start
+## Quick start (PHP built-in server)
 
 ```bash
 # 1. Get the code
@@ -49,6 +54,23 @@ Now open <http://localhost:8000>. The admin panel lives at
 <http://localhost:8000/admin.php>.
 
 The SQLite database is created automatically at `data/surveys.sqlite` on first run.
+
+## Quick start (Docker)
+
+```bash
+# 1. Generate a password hash and put it in .env
+php bin/hash-password.php "choose-a-strong-password"
+cp .env.example .env
+#    set QUICKPOLL_ADMIN_PASSWORD_HASH=<the hash> in .env
+
+# 2. Build and run
+docker compose up --build
+```
+
+Open <http://localhost:8080>. The database persists in the `quickpoll-data` Docker volume.
+
+> No PHP installed locally to run `hash-password.php`? You can also generate the hash inside
+> the container: `docker compose run --rm app php bin/hash-password.php "your-password"`.
 
 ## Configuration
 
@@ -110,13 +132,16 @@ quickpoll/
 │   ├── Controller/      # Home, Survey, Admin controllers
 │   ├── Database/        # PDO connection + schema migrator
 │   ├── Http/            # URL building / redirects
-│   ├── Security/        # CSRF tokens + short-code generation
+│   ├── Security/        # CSRF tokens, short-code generation, rate limiter
 │   ├── Survey/          # Domain models, repository, service, vote tracking
 │   ├── View/            # Tiny template renderer
 │   └── Container.php    # Hand-rolled dependency-injection container
 ├── templates/           # PHP view templates
 ├── data/                # SQLite database lives here (git-ignored)
 ├── bin/hash-password.php # CLI helper to generate an admin password hash
+├── docker/              # Apache override for the Docker image
+├── Dockerfile           # PHP 8.3 + Apache image
+├── docker-compose.yml   # One-command local stack
 ├── config.php           # Loads config from env / config.local.php
 ├── config.example.php   # Template for config.local.php
 └── bootstrap.php        # Autoloader + container bootstrap
@@ -135,6 +160,9 @@ automatically by `SchemaMigrator` on the first database connection.
 - Admin password is hashed (bcrypt) and verified with `password_verify()`.
 - All state-changing forms (login, create, delete, vote) carry a CSRF token.
 - All SQL uses prepared statements; all output is escaped via `View::escape()`.
+- **Rate limiting** (persistent, IP-based) protects admin logins (5 attempts / 15 min) and
+  voting (10 votes / min). The client IP comes from `REMOTE_ADDR`; if you run behind a
+  reverse proxy, make sure it sets that correctly (and don't trust forwarded headers blindly).
 - **Vote de-duplication is session-based** — it stops casual double-voting but is not a
   strong guarantee (clearing cookies allows another vote). See
   [issues / roadmap](#roadmap) for hardening ideas.
@@ -145,13 +173,11 @@ Found a vulnerability? Please see [SECURITY.md](SECURITY.md).
 
 Ideas and good first contributions:
 
-- [ ] Poll expiry / closing date
 - [ ] Stronger duplicate-vote protection (IP + cookie token)
 - [ ] Edit existing polls
 - [ ] CSV / JSON export of results
 - [ ] Multiple admin accounts
 - [ ] A small automated test suite (PHPUnit)
-- [ ] Optional rate limiting on voting and login
 
 ## Contributing
 

@@ -1,0 +1,21 @@
+.git
+.github
+.gitignore
+.gitattributes
+.editorconfig
+.vscode
+.claude
+.idea
+
+# Don't bake local secrets or a dev database into the image
+config.local.php
+.env
+.env.*
+data/*.sqlite
+data/*.sqlite-journal
+data/*.sqlite-wal
+data/*.sqlite-shm
+
+# Docs aren't needed at runtime
+*.md
+CHANGELOG.md

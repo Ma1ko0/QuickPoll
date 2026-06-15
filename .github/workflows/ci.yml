@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    name: PHP lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: pdo, pdo_sqlite
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Lint all PHP files
+        run: |
+          find src public templates bin config.php config.example.php bootstrap.php \
+            -name '*.php' -print0 | xargs -0 -n1 -P4 php -l

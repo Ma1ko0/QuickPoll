@@ -1,0 +1,7 @@
+#KONSOLEH AREA START - PLEASE DO NOT EDIT MANUALLY BETWEEN THESE LINES
+
+#KONSOLEH AREA END - PLEASE ADD MANUAL CHANGES BELOW
+RewriteEngine On
+RewriteRule ^$ public/ [L]
+RewriteRule (.*) public/$1 [L]
+# Alles nach public umleiten

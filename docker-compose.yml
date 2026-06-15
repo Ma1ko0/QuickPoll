@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    image: quickpoll
+    ports:
+      - "8080:80"
+    environment:
+      # Generate a hash with:  php bin/hash-password.php "your-password"
+      # then set it here or in a .env file next to this compose file.
+      QUICKPOLL_ADMIN_PASSWORD_HASH: ${QUICKPOLL_ADMIN_PASSWORD_HASH:-}
+    volumes:
+      # Persist the SQLite database across container rebuilds
+      - quickpoll-data:/var/www/html/data
+    restart: unless-stopped
+
+volumes:
+  quickpoll-data:
