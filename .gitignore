@@ -1,0 +1,33 @@
+# --- Secrets & local configuration ---
+config.local.php
+.env
+.env.*
+!.env.example
+
+# --- Runtime data (SQLite database) ---
+/data/*.sqlite
+/data/*.sqlite-journal
+/data/*.sqlite-wal
+/data/*.sqlite-shm
+
+# --- Dependencies ---
+/vendor/
+
+# --- Claude Code / local tool settings ---
+.claude/settings.local.json
+
+# --- Editors & IDEs ---
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS noise ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs & temp ---
+*.log
+*.tmp
+.tmp_*

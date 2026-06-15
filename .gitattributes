@@ -1,0 +1,16 @@
+# Normalize line endings to LF on checkin
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.jpg binary
+*.gif binary
+
+# Exclude development files from release archives (composer archive / GitHub tarballs)
+/.github            export-ignore
+/.vscode            export-ignore
+/.claude            export-ignore
+.gitattributes      export-ignore
+.gitignore          export-ignore
+.editorconfig       export-ignore
+CONTRIBUTING.md     export-ignore
